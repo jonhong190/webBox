@@ -10,6 +10,7 @@ function newBox(){
     var button = document.getElementById("create_box");
     //click event on button to create a new box
     button.addEventListener('click', (event)=>{
+       
         //increment box count so we can set up unique 'IDs'
         boxCount++;
         //create the box and a header div to handle the box moving
@@ -19,43 +20,24 @@ function newBox(){
         newBox.appendChild(newBoxHeader);
         newBox.setAttribute('class', 'box');
         newBox.setAttribute('id', boxCount);
-
-        //mousedown event for moving the box
-        newBoxHeader.addEventListener('mousedown', mouseDown, true);
+        newBox.setAttribute('style','left:50 px; top: 50 px')
        
         //create resize divs that will take care of resizing the box, each has it's own mousedown event to activate the resize function below
         var resizerTopLeft = document.createElement('div');
-        resizerTopLeft.setAttribute('class', 'resizer top-left');
-        resizerTopLeft.addEventListener('mousedown', resize);
-
         var resizerTopRight = document.createElement('div');
-        resizerTopRight.setAttribute('class', 'resizer top-right');
-        resizerTopRight.addEventListener('mousedown', resize);
-
         var resizerBotLeft = document.createElement('div');
-        resizerBotLeft.setAttribute('class', 'resizer bot-left');
-        resizerBotLeft.addEventListener('mousedown', resize);
-
         var resizerBotRight = document.createElement('div');
-        resizerBotRight.setAttribute('class', 'resizer bot-right');
-        resizerBotRight.addEventListener('mousedown', resize);
-
         var resizerTop = document.createElement('div');
-        resizerTop.setAttribute('class', 'resizer-ns top');
-        resizerTop.addEventListener('mousedown', resize);
-
         var resizerBot = document.createElement('div');
-        resizerBot.setAttribute('class', 'resizer-ns bot');
-        resizerBot.addEventListener('mousedown', resize)
-
         var resizerLeft = document.createElement('div');
-        resizerLeft.setAttribute('class', 'resizer-we left');
-        resizerLeft.addEventListener('mousedown', resize);
-
         var resizerRight = document.createElement('div');
-        resizerRight.setAttribute('class', 'resizer-we right');
-        resizerRight.addEventListener('mousedown', resize);
+        
+        
+        //mousedown event for moving the box
+        newBoxHeader.addEventListener('mousedown', mouseDown, true);
 
+        document.getElementById('box_container').append(newBox);
+        console.log(newBox.getBoundingClientRect().left, newBox.getBoundingClientRect().top)
         newBox.appendChild(resizerTopLeft);
         newBox.appendChild(resizerTopRight);
         newBox.appendChild(resizerBotLeft);
@@ -64,118 +46,41 @@ function newBox(){
         newBox.appendChild(resizerBot);
         newBox.appendChild(resizerLeft);
         newBox.appendChild(resizerRight);
+        resizerTopLeft.setAttribute('class', 'resizer top-left');
+        resizerTopLeft.addEventListener('mouseover', changeCursor);
+        resizerTopLeft.addEventListener('mouseout', defaultCursor);
+        resizerTopLeft.addEventListener('mousedown', initResize);
+        resizerTopRight.setAttribute('class', 'resizer top-right');
+        resizerTopRight.addEventListener('mouseover', changeCursor);
+        resizerTopRight.addEventListener('mouseout', defaultCursor);
+        resizerTopRight.addEventListener('mousedown', initResize);
+        resizerBotLeft.setAttribute('class', 'resizer bot-left');
+        resizerBotLeft.addEventListener('mouseover', changeCursor);
+        resizerBotLeft.addEventListener('mouseout', defaultCursor);
+        resizerBotLeft.addEventListener('mousedown', initResize);
+        resizerBotRight.setAttribute('class', 'resizer bot-right');
+        resizerBotRight.addEventListener('mouseover', changeCursor);
+        resizerBotRight.addEventListener('mouseout', defaultCursor);
+        resizerBotRight.addEventListener('mousedown', initResize);
+        resizerTop.setAttribute('class', 'resizer-ns top');
+        resizerTop.addEventListener('mouseover', changeCursor);
+        resizerTop.addEventListener('mouseout', defaultCursor);
+        resizerTop.addEventListener('mousedown', initResize);
+        resizerBot.setAttribute('class', 'resizer-ns bot');
+        resizerBot.addEventListener('mouseover', changeCursor);
+        resizerBot.addEventListener('mouseout', defaultCursor);
+        resizerBot.addEventListener('mousedown', initResize);
+        resizerLeft.setAttribute('class', 'resizer-we left');
+        resizerLeft.addEventListener('mouseover', changeCursor);
+        resizerLeft.addEventListener('mouseout', defaultCursor);
+        resizerLeft.addEventListener('mousedown', initResize)
+        resizerRight.setAttribute('class', 'resizer-we right');
+        resizerRight.addEventListener('mouseover', changeCursor);
+        resizerRight.addEventListener('mouseout', defaultCursor);
+        resizerRight.addEventListener('mousedown', initResize);
 
- 
 
-        var startX, startY, startWidth, startHeight, cbox, cWidth, cHeight, resizer, minSize, startX, startMouseX, startMouseY;
-        
-        function resize(e){
-            e.preventDefault();
-            startX = e.clientX;
-            startY = e.clientY;
-            startWidth = 100;
-            startHeight = 0;
-            minSize = 100;
-            resizer = this;
-            cbox = document.getElementById(this.parentElement.id);
-            startMouseX = this.parentElement.getBoundingClientRect().left;
-            startMouseY = this.parentElement.getBoundingClientRect().top;
-            xDirection = "";
-            yDirection = "";
-            direction = "";
 
-            window.addEventListener('mousemove', startResize);
-            window.addEventListener('mouseup', stopResize);
-        }
-        function startResize(e){
-            if(resizer.classList.contains('top-left')){
-                //switch cursor based on resizer directions
-                document.body.style.cursor = 'nwse-resize'
-                //the width will be the original width minus the mouse X position minus the parent left bound
-                cWidth = startWidth - (e.clientX - startMouseX);
-                //the height is the original height minus the current mouse Y position minus the parent top bound
-                cHeight = startHeight - (e.clientY - startMouseY);
-                //if the width/height we are expanding to is greater than the minimum set
-                if(cWidth > minSize){
-                    //set the box width
-                    cbox.style.width = cWidth + 'px';
-                    //shifts the box x position according to the increased width essentially giving the illusion that the x position has moved
-                    cbox.style.left = startX + (e.clientX - startMouseX) +'px';
-                }
-                //same principal applies to the height and the rest of the resizers below
-                if(cHeight > minSize){
-                    cbox.style.height = cHeight + 'px';
-                    cbox.style.top = startY + (e.clientY - startMouseY)+'px';
-                }
-                
-            } else if (resizer.classList.contains('bot-right')){
-                document.body.style.cursor = 'nwse-resize';
-                cWidth = startWidth + (e.clientX - startMouseX);
-                cHeight = startHeight + (e.clientY - startMouseY);
-                if(cWidth > minSize){
-                    cbox.style.width = cWidth + 'px';
-                }
-                if(cHeight > minSize){
-                    cbox.style.height = cHeight + 'px';
-                }
-            } else if(resizer.classList.contains('top-right')){
-                document.body.style.cursor = 'nesw-resize';
-                cWidth = startWidth + (e.clientX - startMouseX);
-                cHeight = startHeight - (e.clientY - startMouseY);
-                if(cWidth > minSize){
-                    cbox.style.width = cWidth + 'px';
-                }
-                if(cHeight > minSize){
-                    cbox.style.height = cHeight + 'px';
-                    cbox.style.top = startY + (e.clientY - startMouseY) +'px';
-                }
-            } else if (resizer.classList.contains('bot-left')){
-                document.body.style.cursor = 'nesw-resize';
-                cWidth = startWidth - (e.clientX - startMouseX);
-                cHeight = startHeight + (e.clientY - startMouseY);
-                if(cWidth > minSize){
-                    cbox.style.width = cWidth + 'px';
-                    cbox.style.left = startX + (e.clientX - startMouseX) + 'px';
-                }
-                if(cHeight > minSize){
-                    cbox.style.height = cHeight + 'px';
-                }
-            } else if(resizer.classList.contains('top')){
-                document.body.style.cursor = 'ns-resize'
-                cHeight = startHeight - (e.clientY - startMouseY);
-                if(cHeight > minSize){
-                    cbox.style.height = cHeight + 'px';
-                    cbox.style.top = startY + (e.clientY - startMouseY) + 'px';
-                }
-            } else if(resizer.classList.contains('bot')){
-                document.body.style.cursor = 'ns-resize'
-                cHeight = startHeight + (e.clientY - startMouseY);
-                if(cHeight > minSize){
-                    cbox.style.height = cHeight + 'px';
-                }
-            } else if (resizer.classList.contains('left')){
-                document.body.style.cursor = 'ew-resize';
-                cWidth = startWidth - (e.clientX - startMouseX);
-                if(cWidth > minSize){
-                    cbox.style.width = cWidth + 'px';
-                    cbox.style.left = startX + (e.clientX - startMouseX) +'px'
-                }
-            } else if (resizer.classList.contains('right')){
-                document.body.style.cursor = 'ew-resize'
-                cWidth = startWidth + (e.clientX - startMouseX);
-                if(cWidth > minSize){
-                    cbox.style.width = cWidth + 'px';
-                }
-            }
-           
-        }
-
-        function stopResize(e){
-            //set cursor back to default and remove the event listeners
-            document.body.style.cursor = 'default';
-            window.removeEventListener('mousemove', startResize, false);
-            window.removeEventListener('mouseup', stopResize, false);
-        }
 
         //these three functions take care of the box movement
         function mouseUp(){
@@ -220,7 +125,7 @@ function newBox(){
                     return;
                 }else if (box.getBoundingClientRect().bottom > botContain){
                     box.style.position = 'absolute';
-                    box.style.top = -yPos + 'px';
+                    box.style.top = yPos + 'px';
                     window.removeEventListener('mousemove', boxMove, true);
                     return;
                 }
@@ -234,9 +139,142 @@ function newBox(){
             } 
         };
         
-        document.getElementById('box_container').appendChild(newBox);
+
+        function changeCursor(e){
+            console.log(e)
+            if(this.classList.contains('top')){
+                document.body.style.cursor = 'ns-resize';
+            } else if (this.classList.contains('bot')){
+                document.body.style.cursor = 'ns-resize';
+            } else if (this.classList.contains('right')){
+                document.body.style.cursor = 'ew-resize';
+            } else if (this.classList.contains('left')){
+                document.body.style.cursor = 'ew-resize';
+            } else if (this.classList.contains('top-left')){
+                document.body.style.cursor = 'nwse-resize';
+            } else if (this.classList.contains('top-right')){
+                document.body.style.cursor = 'nesw-resize';
+            } else if (this.classList.contains('bot-left')){
+                document.body.style.cursor = 'nesw-resize';
+            } else if (this.classList.contains('bot-right')){
+                document.body.style.cursor = 'nwse-resize';
+            }
+        }
+        function defaultCursor(){
+            document.body.style.cursor = 'default';
+        }
+
+
+        function initResize(e) {
+            e.preventDefault();
+            const resizer = this;
+            const box = this.parentElement;
+            const minSize = 100;
+            let startWidth = parseInt(getComputedStyle(box, null).width);
+            let startHeight = parseInt(getComputedStyle(box, null).height);
+            let startX = parseInt(getComputedStyle(box, null).left);
+            let startY = parseInt(getComputedStyle(box, null).top);
+            // let startX = box.getBoundingClientRect().left;
+            // let startY = box.getBoundingClientRect().top;
+            console.log(box.getBoundingClientRect().left, box.getBoundingClientRect().top)
+            let startMouseX = e.clientX;
+            let startMouseY = e.clientY;
+            window.addEventListener('mousemove', resize);
+            window.addEventListener('mouseup', stopResize);
+
+            function resize(e) {
+                if (resizer.classList.contains('bot-right')) {
+                    document.body.style.cursor = 'nwse-resize';
+                    const width = startWidth + (e.clientX - startMouseX);
+                    const height = startHeight + (e.clientY - startMouseY);
+                    if (width > minSize) {
+                        box.style.width = width + 'px';
+                    }
+                    if (height > minSize) {
+                        box.style.height = height + 'px';
+                    }
+                }
+                else if (resizer.classList.contains('bot-left')) {
+                    document.body.style.cursor = 'nesw-resize';
+                    const width = startWidth - (e.clientX - startMouseX);
+                    const height = startHeight + (e.clientY - startMouseY);
+                    if (width > minSize) {
+                        box.style.width = width + 'px';
+                        box.style.left = startX + (e.clientX - startMouseX) + 'px';
+                        console.log(box)
+                    }
+                    if (height > minSize) {
+                        box.style.height = height + 'px';
+                    }
+
+                }
+                else if (resizer.classList.contains('top-right')){
+                    document.body.style.cursor = 'nesw-resize';
+                    const width = startWidth + (e.clientX - startMouseX);
+                    const height = startHeight - (e.clientY - startMouseY);
+                    if(width > minSize){
+                        box.style.width = width + 'px';
+                    }
+                    if(height > minSize){
+                        box.style.height = height + 'px';
+                        box.style.top = startY + (e.clientY - startMouseY)+'px';
+                        
+                    }
+                }
+                else if(resizer.classList.contains('top-left')){
+                    document.body.style.cursor = 'nwse-resize';
+                    const width = startWidth - (e.clientX - startMouseX);
+                    const height = startHeight - (e.clientY - startMouseY);
+                    if(width > minSize){
+                        box.style.width = width +'px';
+                        box.style.left = startX + (e.clientX - startMouseX)+'px';
+                    }
+                    if(height > minSize){
+                        box.style.height = height + 'px';
+                        box.style.top = startY + (e.clientY - startMouseY) +'px';
+                    }
+                }
+                else if (resizer.classList.contains('top')) {
+                    document.body.style.cursor = 'ns-resize'
+                    const height = startHeight - (e.clientY - startMouseY);
+                    if (height > minSize) {
+                        box.style.height = height + 'px';
+                        box.style.top = startY + (e.clientY - startMouseY) + 'px';
+                    }
+                }
+                else if (resizer.classList.contains('bot')){
+                    document.body.style.cursor = 'ns-resize';
+                    const height = startHeight + (e.clientY - startMouseY);
+                    if(height > minSize){
+                        box.style.height = height + 'px';
+                    }
+                }
+                else if(resizer.classList.contains('left')){
+                    document.body.style.cursor = 'ew-resize';
+                    const width = startWidth - (e.clientX - startMouseX);
+                    if(width > minSize){
+                        box.style.width = width + 'px';
+                        box.style.left = startX + (e.clientX - startMouseX)+'px';
+                    }
+                }
+                else{
+                    document.body.style.cursor = 'ew-resize';
+                    const width = startWidth + (e.clientX - startMouseX);
+                    if(width > minSize){
+                        box.style.width = width + 'px';
+                    }
+                }
+            }
+
+            function stopResize(e) {
+                document.body.style.cursor = 'default';
+                window.removeEventListener('mousemove', resize);
+            }
+        }
+        
+        
+        
+    
     });
 };
 newBox();
-
-
